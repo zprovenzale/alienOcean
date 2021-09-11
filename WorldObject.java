@@ -2,7 +2,7 @@ public abstract class WorldObject {
 
     //CONSTRUCTORS
 
-    public WorldObject() {
+    WorldObject() {
         int x;
         int y;
         int z;
@@ -36,17 +36,17 @@ public abstract class WorldObject {
         this.z = newZ;
     }
 
-    public static void move(int dx, int dy) {
+    public static void move(int dx, int dy, int dz) {
         this.x += dx;
         this.y += dy;
-    }
-
-    public static void move(int dx, int dy, int dz) {
-        this.move(dx, dy);
         this.z += dz;
     }
 
+    public static void move(int dx, int dy) {
+        this.move(dx, dy, 0)
+    }
+
     public abstract void draw() {
-        
+
     }
 }
