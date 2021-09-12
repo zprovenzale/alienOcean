@@ -10,8 +10,9 @@ public class Player extends WorldObject {
         }
     }
 
-    
-
+    /**
+     * Adds item to inventory
+     */
     public void addItem(String itemName, int num) {
         for(int i in range(invtySize)) {
             if(invty[i].getName() == itemName) {
