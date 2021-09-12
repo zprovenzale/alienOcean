@@ -1,0 +1,126 @@
+//Three.js basics taken from Nick Howe in Computer Graphics
+
+var debug = true
+var view = "leftSide"; //front or top
+var gridLen = 100
+
+var scene, camera, renderer; // Three.js rendering basics.
+
+var keyboard = new KeyboardState(); //tracks when keys are pressed
+
+var canvas; // The canvas on which the image is rendered.
+
+function createPlantA(x, y, z, size) {
+
+  if (debug) {
+    console.log("createPlantA() called")
+  }  
+  
+  const plantAGeom = new THREE.BoxGeometry(size/6, size/6, size);
+  const plantAMat = new THREE.MeshBasicMaterial( {color: 0x237d15} );
+
+  let backLeaf = new THREE.Mesh( plantAGeom, plantAMat );
+  backLeaf.position.z += size/2
+  backLeaf.rotation.x -= .6
+
+  let leftLeaf = new THREE.Mesh(plantAGeom, plantAMat);
+  leftLeaf.rotation.y -= .3;
+  leftLeaf.rotation.x += .2
+  leftLeaf.position.x -= size/5
+  leftLeaf.position.y -= size/3
+  leftLeaf.position.z += size/2
+
+  let rightLeaf = new THREE.Mesh(plantAGeom, plantAMat);
+  rightLeaf.rotation.y += .3;
+  rightLeaf.rotation.x += .2
+  rightLeaf.position.x += size/5
+  rightLeaf.position.y -= size/3
+  rightLeaf.position.z += size/2
+
+
+  backLeaf.attach(leftLeaf)
+  backLeaf.attach(rightLeaf)
+  backLeaf.position.x += x
+  backLeaf.position.y += y
+  backLeaf.position.z += z
+
+  return backLeaf
+}
+
+function createWorld() {
+      if (debug) {
+        console.log("createWorld() called")
+      }
+      renderer.setClearColor(0x23157d); // Set background color
+      scene = new THREE.Scene(); // Create a new scene which we can add objects to.
+    
+      // create a camera
+      camera = new THREE.PerspectiveCamera();
+      if (view == "front") {
+        camera.rotation.x = 1.2
+        camera.position.x = 0
+        camera.position.y = -3
+        camera.position.z = 1
+      }
+
+      //TODO make this actually work
+      if (view == "leftSide") {
+        camera.rotation.x = 1.2
+        camera.rotation.z = 3.14/2
+        camera.position.y = 0
+        camera.position.x = 3
+        camera.position.z = 1
+      }
+
+      if (view == "top"){
+        camera.position.z = 3
+      }
+
+      scene.add(camera)
+
+
+      // create main light
+      var light1 =  new THREE.DirectionalLight( 0xffffff, .5 );
+      light1.position.set(10, 0, 5);
+      scene.add(light1);
+
+      // create secondary light
+      var light2 =  new THREE.DirectionalLight( 0xffffff, .1 );
+      scene.add(light2);
+
+      var floorGeom = new THREE.PlaneGeometry(gridLen, gridLen);
+      var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
+      var floor = new THREE.MeshLambertMaterial()
+      floor = new THREE.Mesh( floorGeom, floorMat);
+      floor.position.x = 0;
+      floor.position.y = 0;
+      scene.add(floor);
+}
+
+function update() {
+
+}
+
+//render the scene
+function render() {
+  update();
+  renderer.render(scene, camera);
+  requestAnimationFrame( render);
+}
+
+// The init() function is called by the onload event when the document has loaded.
+function init() {
+  try {
+    canvas = document.getElementById("glcanvas");
+    renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true} );
+  }
+  catch (e) {
+    document.getElementById("canvas-holder").innerHTML = "<h3><b>WebGL is not available.</b><h3>";
+    return;
+  }
+  
+  createWorld();
+  cube = createPlantA(0, 0, 0, 1)
+  scene.add(cube)
+  render();
+}
