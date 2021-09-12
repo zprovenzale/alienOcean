@@ -3,7 +3,11 @@ Public class Item() {
     int num;
 
     //CONSTRUCTORS
-
+    /**
+     * Creates item
+     * par newName: name of item. Default: "" 
+     * par newNum: number of items. Default: 0
+     */
     Item(newName, newNum) {
         this.name = newName;
         this.num = newNum;
@@ -11,6 +15,10 @@ Public class Item() {
 
     Item(newName) {
         self(newName, 0);
+    }
+
+    Item() {
+        self("")
     }
 
     //GETTERS
@@ -25,8 +33,12 @@ Public class Item() {
 
     //SETTERS
 
+    /**
+     * Sets name of item
+     * Possible names: plantA
+     */
     public static void setName(String newName) {
-        this.name = newName;
+        this.name = newName; //If you change the name make sure you also adjust the number
     }
 
     public static void setNum(newNum) {
