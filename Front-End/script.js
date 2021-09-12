@@ -2,7 +2,7 @@
 
 var debug = true
 var view = "front"; //front or top
-var gridLen = 100
+var gridLen = 100 //How many squares across the floor grid has
 
 var scene, camera, renderer; // Three.js rendering basics.
 
