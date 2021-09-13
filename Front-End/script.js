@@ -65,15 +65,17 @@ function createWorld() {
 //Handles movement
 function update() {
 
-  // if (keyboard.pressed("W")) {
-  //   camera.position.y += speed;
-  // } else if (keyboard.pressed("S")) {
-  //   camera.position.y -= speed;
-  // } if (keyboard.pressed("A")) {
-  //   camera.position.x -= speed;
-  // } else if (keyboard.pressed("D")) {
-  //   camera.position.x += speed;
-  // }
+  keyboard.update()
+
+  if (keyboard.pressed("W")) {
+    camera.position.y += speed;
+  } else if (keyboard.pressed("S")) {
+    camera.position.y -= speed;
+  } if (keyboard.pressed("A")) {
+    camera.position.x -= speed;
+  } else if (keyboard.pressed("D")) {
+    camera.position.x += speed;
+  }
 
 }
 
