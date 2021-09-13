@@ -11,6 +11,8 @@ var keyboard = new KeyboardState(); //tracks when keys are pressed
 
 var canvas; // The canvas on which the image is rendered.
 
+var cameraDirection = new THREE.vector3(0, 0, -1) //Every time you move the camera, adjust this
+
 
 function createWorld() {
       if (debug) {
@@ -41,6 +43,7 @@ function createWorld() {
         camera.position.z = 3
       }
 
+      camera.getWorldDirection(cameraDirection)
       scene.add(camera)
 
 
@@ -87,6 +90,8 @@ function update() {
   } else if (keyboard.pressed("right")) {
     camera.rotation.y -= .1
   }
+
+  camera.getWorldDirection(cameraDirection)
 
 }
 
