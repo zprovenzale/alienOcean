@@ -22,7 +22,7 @@ function createWorld() {
       // create a camera
       camera = new THREE.PerspectiveCamera();
       if (view == "front") {
-        camera.rotation.x = 1.2
+        camera.rotation.x = 3.14/2
         camera.position.x = 0
         camera.position.y = -3
         camera.position.z = 1
@@ -77,11 +77,11 @@ function update() {
     camera.position.x += speed;
   }
 
-  if (keyboard.pressed("up")) {
-    camera.rotation.x += .1
-  } else if (keyboard.pressed("down")) {
-    camera.rotation.x -= .1
-  }
+  // if (keyboard.pressed("up")) {
+  //   camera.rotation.x += .1
+  // } else if (keyboard.pressed("down")) {
+  //   camera.rotation.x -= .1
+  // }
   if (keyboard.pressed("left")) {
     camera.rotation.y += .1
   } else if (keyboard.pressed("right")) {
