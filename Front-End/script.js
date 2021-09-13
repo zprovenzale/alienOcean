@@ -70,23 +70,18 @@ function update() {
 
   keyboard.update()
 
-  //These make the camera move in relation to the direction its facing in the world
-  //TODO up/down left/right gets turned around whe camera turns ): absolute value?
-  let cameraAngX = cameraDirection.x/(cameraDirection.x+cameraDirection.y)
-  let cameraAngY = cameraDirection.y/(cameraDirection.x+cameraDirection.y)
-
   if (keyboard.pressed("W")) { //up
-    camera.position.x += speed * cameraAngX;
-    camera.position.y += speed * cameraAngY;
+    camera.position.x += speed * cameraDirection.x;
+    camera.position.y += speed * cameraDirection.y;
   } else if (keyboard.pressed("S")) { //down
-    camera.position.x -= speed * cameraAngX;
-    camera.position.y -= speed * cameraAngY;
+    camera.position.x -= speed * cameraDirection.x;
+    camera.position.y -= speed * cameraDirection.y;
   } if (keyboard.pressed("A")) { //left
-    camera.position.x -= speed * cameraAngY;
-    camera.position.y += speed * cameraAngX;
+    camera.position.x -= speed * cameraDirection.y;
+    camera.position.y += speed * cameraDirection.x;
   } else if (keyboard.pressed("D")) { //right
-    camera.position.x += speed * cameraAngY;
-    camera.position.y -= speed * cameraAngX;
+    camera.position.x += speed * cameraDirection.y;
+    camera.position.y -= speed * cameraDirection.x;
   }
 
   // if (keyboard.pressed("up")) {
