@@ -65,13 +65,13 @@ function createWorld() {
 //Handles movement
 function update() {
 
-  if (keyboard.pressed("w")) {
+  if (keyboard.pressed("W")) {
     camera.position.y += speed;
-  } else if (keyboard.pressed("s")) {
+  } else if (keyboard.pressed("S")) {
     camera.position.y -= speed;
-  } if (keyboard.pressed("a")) {
+  } if (keyboard.pressed("A")) {
     camera.position.x -= speed;
-  } else if (keyboard.pressed("d")) {
+  } else if (keyboard.pressed("D")) {
     camera.position.x += speed;
   }
 
