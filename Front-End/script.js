@@ -77,6 +77,17 @@ function update() {
     camera.position.x += speed;
   }
 
+  if (keyboard.pressed("up")) {
+    camera.rotation.x += .1
+  } else if (keyboard.pressed("down")) {
+    camera.rotation.x -= .1
+  }
+  if (keyboard.pressed("left")) {
+    camera.rotation.y += .1
+  } else if (keyboard.pressed("right")) {
+    camera.rotation.y -= .1
+  }
+
 }
 
 //render the scene
