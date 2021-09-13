@@ -11,7 +11,7 @@ var keyboard = new KeyboardState(); //tracks when keys are pressed
 
 var canvas; // The canvas on which the image is rendered.
 
-var cameraDirection = new THREE.vector3(0, 0, -1) //Every time you move the camera, adjust this
+var cameraDirection = new THREE.Vector3() //Every time you move the camera, adjust this
 
 
 function createWorld() {
@@ -70,14 +70,22 @@ function update() {
 
   keyboard.update()
 
-  if (keyboard.pressed("W")) {
-    camera.position.y += speed;
-  } else if (keyboard.pressed("S")) {
-    camera.position.y -= speed;
-  } if (keyboard.pressed("A")) {
-    camera.position.x -= speed;
-  } else if (keyboard.pressed("D")) {
-    camera.position.x += speed;
+  //These make the camera move in relation to the direction its facing in the world
+  let cameraAngX = cameraDirection.x/(cameraDirection.x+cameraDirection.y)
+  let cameraAngY = cameraDirection.y/(cameraDirection.x+cameraDirection.y)
+
+  if (keyboard.pressed("W")) { //up
+    camera.position.x += speed * cameraAngX;
+    camera.position.y += speed * cameraAngY;
+  } else if (keyboard.pressed("S")) { //down
+    camera.position.x -= speed * cameraAngX;
+    camera.position.y -= speed * cameraAngY;
+  } if (keyboard.pressed("A")) { //left
+    camera.position.x -= speed * cameraAngY;
+    camera.position.y += speed * cameraAngX;
+  } else if (keyboard.pressed("D")) { //right
+    camera.position.x += speed * cameraAngY;
+    camera.position.y -= speed * cameraAngX;
   }
 
   // if (keyboard.pressed("up")) {
