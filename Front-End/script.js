@@ -70,6 +70,10 @@ function update() {
 
   keyboard.update()
 
+  //How do these vectors work? could it be 1, 1 sometimes and 1, 400 others? If so I
+  //need to standardize these so they always add up to the same number or the speed
+  //will be jerky
+
   if (keyboard.pressed("W")) { //up
     camera.position.x += speed * cameraDirection.x;
     camera.position.y += speed * cameraDirection.y;
