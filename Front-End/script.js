@@ -3,6 +3,7 @@
 var debug = true
 var view = "front"; //front or top
 var gridLen = 100 //How many squares across the floor grid has
+var speed = .1 //how fast player moves
 
 var scene, camera, renderer; // Three.js rendering basics.
 
@@ -61,7 +62,18 @@ function createWorld() {
       scene.add(floor);
 }
 
+//Handles movement
 function update() {
+
+  if (keyboard.pressed("w")) {
+    camera.position.y += speed;
+  } else if (keyboard.pressed("s")) {
+    camera.position.y -= speed;
+  } if (keyboard.pressed("a")) {
+    camera.position.x -= speed;
+  } else if (keyboard.pressed("d")) {
+    camera.position.x += speed;
+  }
 
 }
 
