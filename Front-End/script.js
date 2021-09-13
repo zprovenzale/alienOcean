@@ -71,6 +71,7 @@ function update() {
   keyboard.update()
 
   //These make the camera move in relation to the direction its facing in the world
+  //TODO up/down left/right gets turned around whe camera turns ): absolute value?
   let cameraAngX = cameraDirection.x/(cameraDirection.x+cameraDirection.y)
   let cameraAngY = cameraDirection.y/(cameraDirection.x+cameraDirection.y)
 
