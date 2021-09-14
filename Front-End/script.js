@@ -94,9 +94,9 @@ function update() {
   //   camera.rotation.x -= .1
   // }
   if (keyboard.pressed("left")) {
-    camera.rotation.y += .1
+    camera.rotation.y += speed/3
   } else if (keyboard.pressed("right")) {
-    camera.rotation.y -= .1
+    camera.rotation.y -= speed/3.14
   }
 
   camera.getWorldDirection(cameraDirection)
