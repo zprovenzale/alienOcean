@@ -94,7 +94,7 @@ function update() {
   //   camera.rotation.x -= .1
   // }
   if (keyboard.pressed("left")) {
-    camera.rotation.y += speed/3
+    camera.rotation.y += speed/3.14 //3.14 so when you rotate and move to the side at the same time, you move in a circle
   } else if (keyboard.pressed("right")) {
     camera.rotation.y -= speed/3.14
   }
