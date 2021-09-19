@@ -19,6 +19,7 @@ function createWorld() {
         console.log("createWorld() called")
       }
       renderer.setClearColor(0x23157d); // Set background color
+      var loader = new THREE.TextureLoader(); //create texture loader
       scene = new THREE.Scene(); // Create a new scene which we can add objects to.
     
       // create a camera
@@ -57,9 +58,11 @@ function createWorld() {
       // scene.add(light2);
 
       var floorGeom = new THREE.PlaneGeometry(gridLen, gridLen);
-      var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
+      var sandTexture = loader.load("sand2color.jpg");
+      var sandMat = new THREE.MeshPhongMaterial( { map: sandTexture } );
+      //var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
       var floor = new THREE.MeshLambertMaterial()
-      floor = new THREE.Mesh( floorGeom, floorMat);
+      floor = new THREE.Mesh( floorGeom, sandMat);
       floor.position.x = 0;
       floor.position.y = 0;
       scene.add(floor);
