@@ -48,13 +48,13 @@ function createWorld() {
 
 
       // create main light
-      var light1 =  new THREE.DirectionalLight( 0xffffff, .5 );
+      var light1 =  new THREE.DirectionalLight( 0xffffff, .8 );
       light1.position.set(10, 0, 5);
       scene.add(light1);
 
-      // create secondary light
-      var light2 =  new THREE.DirectionalLight( 0xffffff, .1 );
-      scene.add(light2);
+      // // create secondary light
+      // var light2 =  new THREE.DirectionalLight( 0xffffff, .1 );
+      // scene.add(light2);
 
       var floorGeom = new THREE.PlaneGeometry(gridLen, gridLen);
       var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
@@ -86,6 +86,11 @@ function update() {
   } else if (keyboard.pressed("D")) { //right
     camera.position.x += speed * cameraDirection.y;
     camera.position.y -= speed * cameraDirection.x;
+  }
+
+  //FOR DEBUGGING
+  if (keyboard.pressed("P")) {
+    console.log("camera x: " + camera.position.x + " y: " + camera.position.y)
   }
 
   // if (keyboard.pressed("up")) {
@@ -122,7 +127,9 @@ function init() {
   }
   
   createWorld();
-  cube = createPlantA(0, 0, 0, 1)
-  scene.add(cube)
+  onePlant = createPlantA(0, 1, 0, 1)
+  twoPlant = createPlantB(0, 0, 0, 1)
+  scene.add(onePlant)
+  scene.add(twoPlant)
   render();
 }

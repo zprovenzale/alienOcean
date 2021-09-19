@@ -9,7 +9,7 @@ function createPlantA(x, y, z, size) {
   
     let backLeaf = new THREE.Mesh( plantAGeom, plantAMat );
     backLeaf.position.z += size/2
-    backLeaf.rotation.x -= .6
+    backLeaf.rotation.x -= .4
   
     let leftLeaf = new THREE.Mesh(plantAGeom, plantAMat);
     leftLeaf.rotation.y -= .3;
@@ -33,4 +33,25 @@ function createPlantA(x, y, z, size) {
     backLeaf.position.z += z
   
     return backLeaf
+  }
+
+  function createPlantB(x, y, z, size) {
+    if (debug) {
+      console.log("createPlantB() called")
+    }
+    const baseGeom = new THREE.SphereGeometry(size/3, 8, 8);
+    const mat = new THREE.MeshBasicMaterial( { color: 0x237d15 } );
+    let base = new THREE.Mesh(baseGeom, mat);
+
+    const midGeom = new THREE.SphereGeometry(size/4, 8, 8);
+    let mid = new THREE.Mesh(midGeom, mat);
+    mid.position.z += size/3
+
+    base.attach(mid)
+    
+    base.position.x += x
+    base.position.y += y
+    base.position.z += size/3 + z
+    
+    return base
   }
