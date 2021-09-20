@@ -2,10 +2,11 @@
 
 var debug = true
 var view = "front"; //front or top
-var gridLen = 100 //How many squares across the floor grid has
+var gridLen = 12 //How many squares across the floor grid has
 var speed = .1 //how fast player moves
 
 var scene, camera, renderer; // Three.js rendering basics.
+var loader = new THREE.TextureLoader(); //create texture loader
 
 var keyboard = new KeyboardState(); //tracks when keys are pressed
 
@@ -17,13 +18,14 @@ var cameraDirection = new THREE.Vector3() //Every time you move the camera, adju
 function createWorld() {
       if (debug) {
         console.log("createWorld() called")
+        console.log("yeah it updated1")
       }
       renderer.setClearColor(0x23157d); // Set background color
-      var loader = new THREE.TextureLoader(); //create texture loader
       scene = new THREE.Scene(); // Create a new scene which we can add objects to.
-    
+      
       // create a camera
       camera = new THREE.PerspectiveCamera();
+      camera.far = 2
       if (view == "front") {
         camera.rotation.x = 3.14/2
         camera.position.x = 0
@@ -49,20 +51,27 @@ function createWorld() {
 
 
       // create main light
-      var light1 =  new THREE.DirectionalLight( 0xffffff, .8 );
-      light1.position.set(10, 0, 5);
+      var light1 =  new THREE.DirectionalLight( 0xffffff, .6 );
+      light1.position.set(.5, 0, 1);
       scene.add(light1);
+
+      const lightAmbient = new THREE.AmbientLight( 0xffffff, .4 );
+      scene.add( lightAmbient );
 
       // // create secondary light
       // var light2 =  new THREE.DirectionalLight( 0xffffff, .1 );
       // scene.add(light2);
 
       var floorGeom = new THREE.PlaneGeometry(gridLen, gridLen);
-      var sandTexture = loader.load("sand2color.jpg");
-      var sandMat = new THREE.MeshPhongMaterial( { map: sandTexture } );
+      var sandTexture = loader.load("sand3color.jpg");
+      var sandMat = new THREE.MeshStandardMaterial( { map: sandTexture } );
+      sandMat.bumpMap = loader.load("sand3bump.jpg")
+      sandMat.normalMap = loader.load("sand3normal.jpg")
+      //sandMat.wrapS = THREE.RepeatWrapping;
+      //sandMat.wrapT = THREE.RepeatWrapping;
       //var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
-      var floor = new THREE.MeshLambertMaterial()
-      floor = new THREE.Mesh( floorGeom, sandMat);
+      //var floor = new THREE.MeshLambertMaterial()
+      var floor = new THREE.Mesh( floorGeom, sandMat);
       floor.position.x = 0;
       floor.position.y = 0;
       scene.add(floor);
@@ -94,6 +103,10 @@ function update() {
   //FOR DEBUGGING
   if (keyboard.pressed("P")) {
     console.log("camera x: " + camera.position.x + " y: " + camera.position.y)
+  }
+  if (keyboard.pressed("R")) {
+    renderer.render(scene, camera)
+    console.log("rerendered")
   }
 
   // if (keyboard.pressed("up")) {
