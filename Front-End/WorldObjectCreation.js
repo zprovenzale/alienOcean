@@ -1,7 +1,7 @@
 var textureLoader = new THREE.TextureLoader(); //create texture loader
 var gltfLoader = new THREE.GLTFLoader();
-var mossTexture = textureLoader.load("mossColor.jpg");
-var mossMat = new THREE.MeshStandardMaterial( { map: mossTexture } );
+//var mossTexture = textureLoader.load("mossColor.jpg");
+//var mossMat = new THREE.MeshStandardMaterial( { map: mossTexture } );
 
 function createPlantA(x, y, z, size) {
 
@@ -12,18 +12,18 @@ function createPlantA(x, y, z, size) {
     const plantAGeom = new THREE.BoxGeometry(size/6, size/6, size);
     const plantAMat = new THREE.MeshBasicMaterial( {color: 0x237d15} );
   
-    let backLeaf = new THREE.Mesh( plantAGeom, mossMat );
+    let backLeaf = new THREE.Mesh( plantAGeom, plantAMat);
     backLeaf.position.z += size/2
     backLeaf.rotation.x -= .4
   
-    let leftLeaf = new THREE.Mesh(plantAGeom, mossMat);
+    let leftLeaf = new THREE.Mesh(plantAGeom, plantAMat);
     leftLeaf.rotation.y -= .3;
     leftLeaf.rotation.x += .2
     leftLeaf.position.x -= size/5
     leftLeaf.position.y -= size/3
     leftLeaf.position.z += size/2
   
-    let rightLeaf = new THREE.Mesh(plantAGeom, mossMat);
+    let rightLeaf = new THREE.Mesh(plantAGeom, plantAMat);
     rightLeaf.rotation.y += .3;
     rightLeaf.rotation.x += .2
     rightLeaf.position.x += size/5
@@ -50,7 +50,7 @@ function createPlantA(x, y, z, size) {
     let base = new THREE.Mesh(baseGeom, mossMat);
 
     const midGeom = new THREE.SphereGeometry(size/4, 8, 8);
-    let mid = new THREE.Mesh(midGeom, mossMat);
+    let mid = new THREE.Mesh(midGeom, mat);
     mid.position.z += size/3
 
     base.attach(mid)
