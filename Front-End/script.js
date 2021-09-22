@@ -1,12 +1,13 @@
 //Three.js basics taken from Nick Howe in Computer Graphics
 
 var debug = true
-var view = "front"; //front or top
 var gridLen = 12 //How many squares across the floor grid has
 var speed = .1 //how fast player moves
 
 var scene, camera, renderer; // Three.js rendering basics.
-var loader = new THREE.TextureLoader(); //create texture loader
+var textureLoader = new THREE.TextureLoader(); //create texture loader
+var gltfLoader = new THREE.GLTFLoader();
+var plantA, plantB, plantC, plantD, plantE;
 
 var keyboard = new KeyboardState(); //tracks when keys are pressed
 
@@ -18,55 +19,34 @@ var cameraDirection = new THREE.Vector3() //Every time you move the camera, adju
 function createWorld() {
       if (debug) {
         console.log("createWorld() called")
-        console.log("yeah it updated1")
       }
+
       renderer.setClearColor(0x23157d); // Set background color
       scene = new THREE.Scene(); // Create a new scene which we can add objects to.
       
       // create a camera
       camera = new THREE.PerspectiveCamera();
       camera.far = 2
-      if (view == "front") {
-        camera.rotation.x = 3.14/2
-        camera.position.x = 0
-        camera.position.y = -3
-        camera.position.z = 1
-      }
-
-      //TODO make this actually work
-      if (view == "leftSide") {
-        camera.rotation.x = 1.2
-        camera.rotation.z = 3.14/2
-        camera.position.y = 0
-        camera.position.x = 3
-        camera.position.z = 1
-      }
-
-      if (view == "top"){
-        camera.position.z = 3
-      }
-
+      camera.rotation.x = 3.14/2
+      camera.position.x = 0
+      camera.position.y = -3
+      camera.position.z = 1
       camera.getWorldDirection(cameraDirection)
       scene.add(camera)
 
-
-      // create main light
+      // creates lights
       var light1 =  new THREE.DirectionalLight( 0xffffff, .6 );
       light1.position.set(.5, 0, 1);
       scene.add(light1);
-
       const lightAmbient = new THREE.AmbientLight( 0xffffff, .4 );
       scene.add( lightAmbient );
 
-      // // create secondary light
-      // var light2 =  new THREE.DirectionalLight( 0xffffff, .1 );
-      // scene.add(light2);
-
+      //create floor
       var floorGeom = new THREE.PlaneGeometry(gridLen, gridLen);
-      var sandTexture = loader.load("sand3color.jpg");
+      var sandTexture = textureLoader.load("sand3color.jpg");
       var sandMat = new THREE.MeshStandardMaterial( { map: sandTexture } );
-      sandMat.bumpMap = loader.load("sand3bump.jpg")
-      sandMat.normalMap = loader.load("sand3normal.jpg")
+      sandMat.bumpMap = textureLoader.load("sand3bump.jpg")
+      sandMat.normalMap = textureLoader.load("sand3normal.jpg")
       //sandMat.wrapS = THREE.RepeatWrapping;
       //sandMat.wrapT = THREE.RepeatWrapping;
       //var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
@@ -75,6 +55,30 @@ function createWorld() {
       floor.position.x = 0;
       floor.position.y = 0;
       scene.add(floor);
+}
+
+function loadMeshes() {
+  if (debug) {
+    console.log("loadMeshes() called")
+  }
+  gltfLoader.load(
+    "4leafcurlplant8.glb",
+    // function below is called when the resource is loaded
+    function ( gltf ) {
+      plantA = gltf.scene;  // search through the loaded file for the object we want
+      scene.add(plantA)
+      requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
+    },
+        
+    // called while loading is progressing
+    function ( xhr ) {
+      console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+    // called when loading has errors
+    function ( error ) {
+      console.log( 'An error happened' );
+    }
+  );
 }
 
 //Handles movement
@@ -86,10 +90,11 @@ function update() {
   //need to standardize these so they always add up to the same number or the speed
   //will be jerky
 
-  if (keyboard.pressed("W")) { //up
+  //camera movement
+  if (keyboard.pressed("W")) { //forward
     camera.position.x += speed * cameraDirection.x;
     camera.position.y += speed * cameraDirection.y;
-  } else if (keyboard.pressed("S")) { //down
+  } else if (keyboard.pressed("S")) { //backward
     camera.position.x -= speed * cameraDirection.x;
     camera.position.y -= speed * cameraDirection.y;
   } if (keyboard.pressed("A")) { //left
@@ -99,21 +104,7 @@ function update() {
     camera.position.x += speed * cameraDirection.y;
     camera.position.y -= speed * cameraDirection.x;
   }
-
-  //FOR DEBUGGING
-  if (keyboard.pressed("P")) {
-    console.log("camera x: " + camera.position.x + " y: " + camera.position.y)
-  }
-  if (keyboard.pressed("R")) {
-    renderer.render(scene, camera)
-    console.log("rerendered")
-  }
-
-  // if (keyboard.pressed("up")) {
-  //   camera.rotation.x += .1
-  // } else if (keyboard.pressed("down")) {
-  //   camera.rotation.x -= .1
-  // }
+//camera look around
   if (keyboard.pressed("left")) {
     camera.rotation.y += speed/3.14 //3.14 so when you rotate and move to the side at the same time, you move in a circle
   } else if (keyboard.pressed("right")) {
@@ -121,7 +112,6 @@ function update() {
   }
 
   camera.getWorldDirection(cameraDirection)
-
 }
 
 //render the scene
@@ -143,9 +133,18 @@ function init() {
   }
   
   createWorld();
-  onePlant = createPlantA(0, 1, 0, 1)
-  twoPlant = createPlantB(0, 0, 0, 1)
-  scene.add(onePlant)
-  scene.add(twoPlant)
+  loadMeshes();
+
+  scene.add(plantA)
+  //plantA1 = plantA.clone()
+  //scene.add(plantA1)
+
+  console.log("yes updated")
+  onePlant = createPlantA(0, 0, 0, 1)
+  //twoPlant = createPlantB(0, 0, 0, 1)
+  threePlant = loadPlant(2, 0, 0 , 1)
+ //scene.add(onePlant)
+  //scene.add(threePlant)
+  //scene.remove(threePlant)
   render();
 }

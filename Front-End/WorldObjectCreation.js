@@ -1,5 +1,6 @@
-var loader = new THREE.TextureLoader(); //create texture loader
-var mossTexture = loader.load("mossColor.jpg");
+var textureLoader = new THREE.TextureLoader(); //create texture loader
+var gltfLoader = new THREE.GLTFLoader();
+var mossTexture = textureLoader.load("mossColor.jpg");
 var mossMat = new THREE.MeshStandardMaterial( { map: mossTexture } );
 
 function createPlantA(x, y, z, size) {
@@ -43,7 +44,6 @@ function createPlantA(x, y, z, size) {
     if (debug) {
       console.log("createPlantB() called")
     }
-    //mossMat.normalMap = loader.load("mossNormal.jpg")
 
     const baseGeom = new THREE.SphereGeometry(size/3, 8, 8);
     const mat = new THREE.MeshBasicMaterial( { color: 0x237d15 } );
@@ -60,4 +60,25 @@ function createPlantA(x, y, z, size) {
     base.position.z += size/3 + z
     
     return base
+  }
+
+  function loadMesh(fileName) {
+    gltfLoader.load(
+      fileName,
+      // function below is called when the resource is loaded
+      function ( gltf ) {
+        mesh = gltf.scene;  // search through the loaded file for the object we want
+        requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
+        return mesh
+      },
+          
+      // called while loading is progressing
+      function ( xhr ) {
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      },
+      // called when loading has errors
+      function ( error ) {
+        console.log( 'An error happened' );
+      }
+    );
   }
