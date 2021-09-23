@@ -1,6 +1,14 @@
+import com.sun.net.httpserver.*;
+
+import java.io.IOException;
+import java.io.OutputStream;
+// import java.net.InetSocketAddress;
+// import java.util.concurrent.Executors;
+//import org.apache.commons.lang3.StringEscapeUtils;
+
 
 //code from https://dzone.com/articles/simple-http-server-in-java
-private class MyHttpHandler implements HttpHandler {    
+public class MyHttpHandler implements HttpHandler {    
   @Override    
   public void handle(HttpExchange httpExchange) throws IOException {
     String requestParamValue=null; 
@@ -31,12 +39,17 @@ private class MyHttpHandler implements HttpHandler {
                     .append("</body>")
                     .append("</html>");
             // encode HTML content 
-            String htmlResponse = StringEscapeUtils.escapeHtml4(htmlBuilder.toString());
-     
+            //String htmlResponse = StringEscapeUtils.escapeHtml4(htmlBuilder.toString());
+            String htmlResponse = "hi";
             // this line is a must
             httpExchange.sendResponseHeaders(200, htmlResponse.length());
             outputStream.write(htmlResponse.getBytes());
             outputStream.flush();
             outputStream.close();
+        }
+
+        private String handlePostRequest(HttpExchange httpExchange) {
+          return "";
+
         }
 }
