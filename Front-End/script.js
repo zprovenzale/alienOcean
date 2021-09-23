@@ -1,5 +1,6 @@
+//Current jquery is the development version, will want to switch to production version eventually
+ 
 //Three.js basics taken from Nick Howe in Computer Graphics
-
 var debug = true
 var gridLen = 12 //How many squares across the floor grid has
 var speed = .1 //how fast player moves
