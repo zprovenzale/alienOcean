@@ -8,6 +8,7 @@ var speed = .1 //how fast player moves
 var scene, camera, renderer; // Three.js rendering basics.
 var textureLoader = new THREE.TextureLoader(); //create texture loader
 var gltfLoader = new THREE.GLTFLoader();
+var dict = new Object()
 var plantA, plantB, plantC, plantD, plantE;
 
 var keyboard = new KeyboardState(); //tracks when keys are pressed
@@ -16,7 +17,7 @@ var canvas; // The canvas on which the image is rendered.
 
 var cameraDirection = new THREE.Vector3() //Every time you move the camera, adjust this
 
-
+//creates camera, lights, and floor
 function createWorld() {
       if (debug) {
         console.log("createWorld() called")
@@ -43,44 +44,89 @@ function createWorld() {
       scene.add( lightAmbient );
 
       //create floor
-      // var floorGeom = new THREE.PlaneGeometry(gridLen, gridLen);
-      // var sandTexture = textureLoader.load("sand3color.jpg");
-      // var sandMat = new THREE.MeshStandardMaterial( { map: sandTexture } );
-      // sandMat.bumpMap = textureLoader.load("sand3bump.jpg")
-      // sandMat.normalMap = textureLoader.load("sand3normal.jpg")
-      // //sandMat.wrapS = THREE.RepeatWrapping;
-      // //sandMat.wrapT = THREE.RepeatWrapping;
-      // //var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
-      // //var floor = new THREE.MeshLambertMaterial()
-      // var floor = new THREE.Mesh( floorGeom, sandMat);
-      // floor.position.x = 0;
-      // floor.position.y = 0;
-      // scene.add(floor);
+      var floorGeom = new THREE.PlaneGeometry(gridLen, gridLen);
+      var sandTexture = textureLoader.load("sand3color.jpg");
+      var sandMat = new THREE.MeshStandardMaterial( { map: sandTexture } );
+      sandMat.bumpMap = textureLoader.load("sand3bump.jpg")
+      sandMat.normalMap = textureLoader.load("sand3normal.jpg")
+      //sandMat.wrapS = THREE.RepeatWrapping;
+      //sandMat.wrapT = THREE.RepeatWrapping;
+      //var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
+      //var floor = new THREE.MeshLambertMaterial()
+      var floor = new THREE.Mesh( floorGeom, sandMat);
+      floor.position.x = 0;
+      floor.position.y = 0;
+      scene.add(floor);
 }
 
-// function loadMeshes() {
-//   if (debug) {
-//     console.log("loadMeshes() called")
-//   }
-//   gltfLoader.load(
-//     "4leafcurlplant8.glb",
-//     // function below is called when the resource is loaded
-//     function ( gltf ) {
-//       plantA = gltf.scene;  // search through the loaded file for the object we want
-//       scene.add(plantA)
-//       requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
-//     },
+function loadMeshes() {
+  if (debug) {
+    console.log("loadMeshes() called")
+  }
+  gltfLoader.load(
+    "4leafcurlplant82.glb",
+    // function below is called when the resource is loaded
+    function ( gltf ) {
+      plantA = gltf.scene;  // search through the loaded file for the object we want
+      //createWorldObjects()
+      //requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
+    },
         
-//     // called while loading is progressing
-//     function ( xhr ) {
-//       console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-//     },
-//     // called when loading has errors
-//     function ( error ) {
-//       console.log( 'An error happened' );
-//     }
-//   );
-// }
+    // called while loading is progressing
+    function ( xhr ) {
+      console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+    // called when loading has errors
+    function ( error ) {
+      console.log( 'An error happened' );
+    }
+  );
+  gltfLoader.load(
+    "6oddleafplant3.glb",
+    // function below is called when the resource is loaded
+    function ( gltf ) {
+      plantB = gltf.scene;  // search through the loaded file for the object we want
+      createWorldObjects()
+      //createWorldObjects()
+      //createWorldObjects()
+      //requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
+    },
+        
+    // called while loading is progressing
+    function ( xhr ) {
+      console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+    // called when loading has errors
+    function ( error ) {
+      console.log( 'An error happened' );
+    }
+  );
+}
+
+function createWorldObjects() {
+  createPlant("a", 0, 1)
+  createPlant("a", 2, 4)
+  createPlant("a", 0, 0)
+  createPlant("b", 1, 0)
+}
+
+function createPlant(type, x, y) {
+  let newPlant;
+  if (type == "a") {
+    newPlant = plantA.clone()
+  } else if (type == "b") {
+    newPlant = plantB.clone()
+  } else {
+    console.log("error: invalid plant letter")
+    return
+  }
+  newPlant.position.x = x
+  newPlant.position.y = y
+  dict[[x, y]] = new Object();
+  dict[[x, y]].name = type
+  dict[[x, y]].obj = newPlant;
+  scene.add(dict[[x, y]].obj)
+}
 
 //Handles movement
 function update() {
@@ -134,15 +180,14 @@ function init() {
   }
   
   createWorld();
-  // loadMeshes();
+  loadMeshes();
+  const geometry = new THREE.BoxGeometry( 1, 1, .1 );
+  const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+  const cube = new THREE.Mesh( geometry, material );
+  scene.add( cube );
 
-  scene.add(plantA)
-  //plantA1 = plantA.clone()
-  //scene.add(plantA1)
-
-  console.log("yes updated")
-  onePlant = createPlantA(0, 0, 0, 1)
-  scene.add(onePlant)
+  console.log("yes it super updated")
+  //scene.add(onePlant)
   //twoPlant = createPlantB(0, 0, 0, 1)
   //threePlant = loadPlant(2, 0, 0 , 1)
  //scene.add(onePlant)
