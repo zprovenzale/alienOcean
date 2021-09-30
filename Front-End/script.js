@@ -9,7 +9,7 @@ var scene, camera, renderer; // Three.js rendering basics.
 var textureLoader = new THREE.TextureLoader(); //create texture loader
 var gltfLoader = new THREE.GLTFLoader();
 var dict = new Object()
-var plantA, plantB, plantC, plantD, plantE;
+var cloneableObjs = new Map()
 
 var keyboard = new KeyboardState(); //tracks when keys are pressed
 
@@ -65,9 +65,10 @@ function loadMeshes() {
   }
   gltfLoader.load(
     "4leafcurlplant82.glb",
+    //let plantAPromise = new Promise(function(resolve, reject))
     // function below is called when the resource is loaded
     function ( gltf ) {
-      plantA = gltf.scene;  // search through the loaded file for the object we want
+      cloneableObjs.set("plantA", gltf.scene);  // search through the loaded file for the object we want
       //createWorldObjects()
       //requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
     },
@@ -85,10 +86,7 @@ function loadMeshes() {
     "6oddleafplant3.glb",
     // function below is called when the resource is loaded
     function ( gltf ) {
-      plantB = gltf.scene;  // search through the loaded file for the object we want
-      createWorldObjects()
-      //createWorldObjects()
-      //createWorldObjects()
+      cloneableObjs.set("plantB", gltf.scene);  // search through the loaded file for the object we want
       //requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
     },
         
@@ -103,26 +101,29 @@ function loadMeshes() {
   );
 }
 
-function createWorldObjects() {
-  createPlant("a", 0, 1)
-  createPlant("a", 2, 4)
-  createPlant("a", 0, 0)
-  createPlant("b", 1, 0)
+window.addEventListener('load', (event) => {
+  console.log('fully loaded and parsed');
+  let worldObjPos = new Object()
+  worldObjPos.plantA = [[2,3],[1,0],[4,5]]
+  worldObjPos.plantB = [[1,4],[2,5],[0,3]]
+  createWorldObjects(worldObjPos)
+});
+
+function createWorldObjects(worldObjPos) {
+  for (let i = 0; i < worldObjPos.plantA.length; i += 1) {
+    createObj("plantA", worldObjPos.plantA[i][0], worldObjPos.plantA[i][1])
+  }
+  for (let i = 0; i < worldObjPos.plantB.length; i += 1) {
+    createObj("plantB", worldObjPos.plantB[i][0], worldObjPos.plantB[i][1])
+  }
 }
 
-function createPlant(type, x, y) {
-  let newPlant;
-  if (type == "a") {
-    newPlant = plantA.clone()
-  } else if (type == "b") {
-    newPlant = plantB.clone()
-  } else {
-    console.log("error: invalid plant letter")
-    return
-  }
+function createObj(type, x, y) {
+  let newPlant = cloneableObjs.get(type).clone()
   newPlant.position.x = x
   newPlant.position.y = y
   dict[[x, y]] = newPlant;
+  dict[[x, y]].name = type
   scene.add(dict[[x, y]])
 }
 
@@ -184,7 +185,7 @@ function init() {
   const cube = new THREE.Mesh( geometry, material );
   scene.add( cube );
 
-  console.log("yes it super updated")
+  console.log("yes it updated")
   //scene.add(onePlant)
   //twoPlant = createPlantB(0, 0, 0, 1)
   //threePlant = loadPlant(2, 0, 0 , 1)
