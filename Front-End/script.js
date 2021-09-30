@@ -59,72 +59,48 @@ function createWorld() {
       scene.add(floor);
 }
 
-function loadMeshes() {
-  if (debug) {
-    console.log("loadMeshes() called")
-  }
-  gltfLoader.load(
-    "4leafcurlplant82.glb",
-    //let plantAPromise = new Promise(function(resolve, reject))
-    // function below is called when the resource is loaded
-    function ( gltf ) {
-      cloneableObjs.set("plantA", gltf.scene);  // search through the loaded file for the object we want
-      //createWorldObjects()
-      //requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
-    },
-        
-    // called while loading is progressing
-    function ( xhr ) {
-      console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    },
-    // called when loading has errors
-    function ( error ) {
-      console.log( 'An error happened' );
-    }
-  );
-  gltfLoader.load(
-    "6oddleafplant3.glb",
-    // function below is called when the resource is loaded
-    function ( gltf ) {
-      cloneableObjs.set("plantB", gltf.scene);  // search through the loaded file for the object we want
-      //requestAnimationFrame( render );  // we don't want to start rendering until the model is loaded
-    },
-        
-    // called while loading is progressing
-    function ( xhr ) {
-      console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    },
-    // called when loading has errors
-    function ( error ) {
-      console.log( 'An error happened' );
-    }
-  );
+//loads a mesh with the name url and the kind of object type
+function loadMesh(name) {
+  let url = name + ".glb"
+  return new Promise(function(resolve, reject) {
+    gltfLoader.load(
+      url,
+      //called when loading finishes
+      function( gltf ) {
+        newObj = gltf.scene
+        cloneableObjs.set(name, newObj); //adds loaded object to dictionary of cloneable objects
+        resolve()
+      },
+      //called while loading
+      function ( xhr ) {
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      },
+      // called when loading has errors
+      function ( error ) {
+        console.log( 'An error happened' );
+        reject()
+      }
+    )
+  })
 }
 
-window.addEventListener('load', (event) => {
-  console.log('fully loaded and parsed');
-  let worldObjPos = new Object()
-  worldObjPos.plantA = [[2,3],[1,0],[4,5]]
-  worldObjPos.plantB = [[1,4],[2,5],[0,3]]
-  createWorldObjects(worldObjPos)
-});
-
+//iterates through world object keys which are types of object.,
+//for each key iterates through the array of values, which are [x, y] coords
+//for each of these objects and coordinates, clones the correct type of object,
+//positions that object, and add the object and its name to the dict of objects in the world
 function createWorldObjects(worldObjPos) {
-  for (let i = 0; i < worldObjPos.plantA.length; i += 1) {
-    createObj("plantA", worldObjPos.plantA[i][0], worldObjPos.plantA[i][1])
+  for (let [key, value] of worldObjPos) {
+    for (let i = 0; i < value.length; i += 1) {
+      //createObj(key, value[i][0], value[i][1])
+      let newPlant = cloneableObjs.get(key).clone()
+      newPlant.position.x = value[i][0]
+      newPlant.position.y = value[i][1]
+      dict[[value[i][0], value[i][1]]] = newPlant;
+      dict[[value[i][0], value[i][1]]].name = key
+      scene.add(dict[[value[i][0], value[i][1]]])
+    }
   }
-  for (let i = 0; i < worldObjPos.plantB.length; i += 1) {
-    createObj("plantB", worldObjPos.plantB[i][0], worldObjPos.plantB[i][1])
-  }
-}
 
-function createObj(type, x, y) {
-  let newPlant = cloneableObjs.get(type).clone()
-  newPlant.position.x = x
-  newPlant.position.y = y
-  dict[[x, y]] = newPlant;
-  dict[[x, y]].name = type
-  scene.add(dict[[x, y]])
 }
 
 //Handles movement
@@ -179,13 +155,20 @@ function init() {
   }
   
   createWorld();
-  loadMeshes();
+  promisePlantA = loadMesh("plantA");
+  promisePlantB = loadMesh("plantB");
+  Promise.all([promisePlantA,promisePlantB]).then(function() {
+    worldObjPos = new Map()
+    worldObjPos.set("plantA", [[1, 2], [3, 4]]);
+    worldObjPos.set("plantB", [[2, 1],[3,5],[2,5]]);
+    createWorldObjects(worldObjPos);
+  })
   const geometry = new THREE.BoxGeometry( 1, 1, .1 );
   const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
   const cube = new THREE.Mesh( geometry, material );
   scene.add( cube );
 
-  console.log("yes it updated")
+  console.log("yes it definitely updated")
   //scene.add(onePlant)
   //twoPlant = createPlantB(0, 0, 0, 1)
   //threePlant = loadPlant(2, 0, 0 , 1)
