@@ -122,10 +122,8 @@ function createPlant(type, x, y) {
   }
   newPlant.position.x = x
   newPlant.position.y = y
-  dict[[x, y]] = new Object();
-  dict[[x, y]].name = type
-  dict[[x, y]].obj = newPlant;
-  scene.add(dict[[x, y]].obj)
+  dict[[x, y]] = newPlant;
+  scene.add(dict[[x, y]])
 }
 
 //Handles movement
