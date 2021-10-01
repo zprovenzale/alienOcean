@@ -8,8 +8,13 @@ var speed = .1 //how fast player moves
 var scene, camera, renderer; // Three.js rendering basics.
 var textureLoader = new THREE.TextureLoader(); //create texture loader
 var gltfLoader = new THREE.GLTFLoader();
-var dict = new Object()
-var cloneableObjs = new Map()
+var objCoords = new Object();
+var glbObjs = new Map();
+var player;
+
+var inventory = new Map()
+inventory["plantA"] = 0;
+inventory["plantB"] = 0;
 
 var keyboard = new KeyboardState(); //tracks when keys are pressed
 
@@ -19,22 +24,19 @@ var cameraDirection = new THREE.Vector3() //Every time you move the camera, adju
 
 //creates camera, lights, and floor
 function createWorld() {
-      if (debug) {
+      if (debug)
         console.log("createWorld() called")
-      }
 
       renderer.setClearColor(0x23157d); // Set background color
       scene = new THREE.Scene(); // Create a new scene which we can add objects to.
       
-      // create a camera
+      // creates camera
       camera = new THREE.PerspectiveCamera();
-      camera.far = 2
-      camera.rotation.x = 3.14/2
+      camera.rotation.x = 1.2
       camera.position.x = 0
       camera.position.y = -3
-      camera.position.z = 1
+      camera.position.z = 2
       camera.getWorldDirection(cameraDirection)
-      scene.add(camera)
 
       // creates lights
       var light1 =  new THREE.DirectionalLight( 0xffffff, .6 );
@@ -43,7 +45,7 @@ function createWorld() {
       const lightAmbient = new THREE.AmbientLight( 0xffffff, .4 );
       scene.add( lightAmbient );
 
-      //create floor
+      //creates floor
       var floorGeom = new THREE.PlaneGeometry(gridLen, gridLen);
       var sandTexture = textureLoader.load("sand3color.jpg");
       var sandMat = new THREE.MeshStandardMaterial( { map: sandTexture } );
@@ -51,8 +53,6 @@ function createWorld() {
       sandMat.normalMap = textureLoader.load("sand3normal.jpg")
       //sandMat.wrapS = THREE.RepeatWrapping;
       //sandMat.wrapT = THREE.RepeatWrapping;
-      //var floorMat = new THREE.MeshLambertMaterial({color: 0xff0000});
-      //var floor = new THREE.MeshLambertMaterial()
       var floor = new THREE.Mesh( floorGeom, sandMat);
       floor.position.x = 0;
       floor.position.y = 0;
@@ -61,6 +61,8 @@ function createWorld() {
 
 //loads a mesh with the name url and the kind of object type
 function loadMesh(name) {
+  if (debug)
+    console.log(name + " loading")
   let url = name + ".glb"
   return new Promise(function(resolve, reject) {
     gltfLoader.load(
@@ -68,7 +70,7 @@ function loadMesh(name) {
       //called when loading finishes
       function( gltf ) {
         newObj = gltf.scene
-        cloneableObjs.set(name, newObj); //adds loaded object to dictionary of cloneable objects
+        glbObjs.set(name, newObj); //adds loaded object to dictionary of cloneable objects
         resolve()
       },
       //called while loading
@@ -92,12 +94,13 @@ function createWorldObjects(worldObjPos) {
   for (let [key, value] of worldObjPos) {
     for (let i = 0; i < value.length; i += 1) {
       //createObj(key, value[i][0], value[i][1])
-      let newPlant = cloneableObjs.get(key).clone()
+      let newPlant = glbObjs.get(key).clone()
       newPlant.position.x = value[i][0]
       newPlant.position.y = value[i][1]
-      dict[[value[i][0], value[i][1]]] = newPlant;
-      dict[[value[i][0], value[i][1]]].name = key
-      scene.add(dict[[value[i][0], value[i][1]]])
+      objCoords[[value[i][0], value[i][1]]] = newPlant;
+      objCoords[[value[i][0], value[i][1]]].name = key;
+      console.log("objCoords.name: " + objCoords[[value[i][0], value[i][1]]].name)
+      scene.add(objCoords[[value[i][0], value[i][1]]])
     }
   }
 
@@ -112,25 +115,39 @@ function update() {
   //need to standardize these so they always add up to the same number or the speed
   //will be jerky
 
-  //camera movement
+  //player +  movement
   if (keyboard.pressed("W")) { //forward
-    camera.position.x += speed * cameraDirection.x;
-    camera.position.y += speed * cameraDirection.y;
+    player.position.x += speed * cameraDirection.x;
+    player.position.y += speed * cameraDirection.y;
   } else if (keyboard.pressed("S")) { //backward
-    camera.position.x -= speed * cameraDirection.x;
-    camera.position.y -= speed * cameraDirection.y;
+    player.position.x -= speed * cameraDirection.x;
+    player.position.y -= speed * cameraDirection.y;
   } if (keyboard.pressed("A")) { //left
-    camera.position.x -= speed * cameraDirection.y;
-    camera.position.y += speed * cameraDirection.x;
+    player.position.x -= speed * cameraDirection.y;
+    player.position.y += speed * cameraDirection.x;
   } else if (keyboard.pressed("D")) { //right
-    camera.position.x += speed * cameraDirection.y;
-    camera.position.y -= speed * cameraDirection.x;
+    player.position.x += speed * cameraDirection.y;
+    player.position.y -= speed * cameraDirection.x;
   }
-//camera look around
+
+  //player + camera look around
   if (keyboard.pressed("left")) {
-    camera.rotation.y += speed/3.14 //3.14 so when you rotate and move to the side at the same time, you move in a circle
+    player.rotation.z += speed/3
   } else if (keyboard.pressed("right")) {
-    camera.rotation.y -= speed/3.14
+      player.rotation.z -= speed/3
+    //picks up objects
+  } else if (keyboard.up("up")) {
+      let playerPosKey = [Math.round(player.position.x), Math.round(player.position.y)]
+      if(playerPosKey in objCoords) {
+        let invKey = objCoords[playerPosKey].name
+        console.log("invKey: " + invKey);
+        inventory[invKey] += 1
+        console.log(inventory[objCoords[playerPosKey].name])
+        scene.remove(objCoords[playerPosKey]);
+        delete objCoords[playerPosKey];
+      }
+  } else if (keyboard.pressed("down")) {
+    //camera.rotation.x -= speed/3.14
   }
 
   camera.getWorldDirection(cameraDirection)
@@ -157,23 +174,34 @@ function init() {
   createWorld();
   promisePlantA = loadMesh("plantA");
   promisePlantB = loadMesh("plantB");
+  promisePlayer = loadMesh("player");
   Promise.all([promisePlantA,promisePlantB]).then(function() {
     worldObjPos = new Map()
     worldObjPos.set("plantA", [[1, 2], [3, 4]]);
     worldObjPos.set("plantB", [[2, 1],[3,5],[2,5]]);
     createWorldObjects(worldObjPos);
   })
+  promisePlayer.then(function() {
+    if (debug)
+      console.log("player loaded")
+    player = glbObjs.get("player")
+    scene.add(player)
+    player.add(camera)
+  })
+  //size reference cube
   const geometry = new THREE.BoxGeometry( 1, 1, .1 );
   const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
   const cube = new THREE.Mesh( geometry, material );
-  scene.add( cube );
+  //scene.add( cube );
 
-  console.log("yes it definitely updated")
+  console.log("yes updated")
+  Promise.all([promisePlantA,promisePlantB,promisePlayer]).then(function() {
+    render();
+  })
   //scene.add(onePlant)
   //twoPlant = createPlantB(0, 0, 0, 1)
   //threePlant = loadPlant(2, 0, 0 , 1)
  //scene.add(onePlant)
   //scene.add(threePlant)
   //scene.remove(threePlant)
-  render();
 }
