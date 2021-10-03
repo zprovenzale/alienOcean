@@ -136,7 +136,7 @@ function update() {
   } else if (keyboard.pressed("right")) {
       player.rotation.z -= speed/3
     //picks up objects
-  } else if (keyboard.up("up")) {
+  } else if (keyboard.up ("up")) {
       let playerPosKey = [Math.round(player.position.x), Math.round(player.position.y)]
       if(playerPosKey in objCoords) {
         let invKey = objCoords[playerPosKey].name
