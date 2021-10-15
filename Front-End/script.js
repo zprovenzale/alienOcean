@@ -142,7 +142,7 @@ function update() {
         let invKey = objCoords[playerPosKey].name
         console.log("invKey: " + invKey);
         inventory[invKey] += 1
-        console.log(inventory[objCoords[playerPosKey].name])
+        console.log("num in inv:", inventory[objCoords[playerPosKey].name])
         scene.remove(objCoords[playerPosKey]);
         delete objCoords[playerPosKey];
       }
@@ -177,8 +177,8 @@ function init() {
   promisePlayer = loadMesh("player");
   Promise.all([promisePlantA,promisePlantB]).then(function() {
     worldObjPos = new Map()
-    worldObjPos.set("plantA", [[1, 2], [3, 4]]);
-    worldObjPos.set("plantB", [[2, 1],[3,5],[2,5]]);
+    worldObjPos.set("plantA", [[1, 2], [3, 4],[2,3],[2,4],[5,2],[0,2],[-3,4],[3,-2]]);
+    worldObjPos.set("plantB", [[2, 1],[3,5],[2,5],[5,3],[4,3],[4,2]]);
     createWorldObjects(worldObjPos);
   })
   promisePlayer.then(function() {
@@ -194,7 +194,7 @@ function init() {
   const cube = new THREE.Mesh( geometry, material );
   //scene.add( cube );
 
-  console.log("yes updated")
+  console.log("yes it sure updated")
   Promise.all([promisePlantA,promisePlantB,promisePlayer]).then(function() {
     render();
   })
