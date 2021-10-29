@@ -8,7 +8,7 @@ var speed = .1 //how fast player moves
 var scene, camera, renderer; // Three.js rendering basics.
 var textureLoader = new THREE.TextureLoader(); //create texture loader
 var gltfLoader = new THREE.GLTFLoader();
-var objCoords = new Object();
+var worldObjs = new Object();
 var glbObjs = new Map();
 var player;
 
@@ -57,6 +57,32 @@ function createWorld() {
       floor.position.x = 0;
       floor.position.y = 0;
       scene.add(floor);
+
+      //creates walls
+      var wallGeom = new THREE.PlaneGeometry(gridLen, gridLen);
+      var wallMat = new THREE.MeshStandardMaterial( { color: 0xf000000 } );
+
+      //sandMat.wrapS = THREE.RepeatWrapping;
+      //sandMat.wrapT = THREE.RepeatWrapping;
+      var eastWall = new THREE.Mesh( wallGeom, wallMat);
+      eastWall.rotateY(3.14/2);
+      eastWall.position.x = -gridLen/2;
+      scene.add(eastWall);
+
+      var westWall = new THREE.Mesh(wallGeom, wallMat)
+      westWall.rotateY(-3.14/2)
+      westWall.position.x = gridLen/2
+      scene.add(westWall)
+
+      var northWall = new THREE.Mesh(wallGeom, wallMat)
+      northWall.rotateX(3.14/2)
+      northWall.position.y = gridLen/2
+      scene.add(northWall)
+
+      var southWall = new THREE.Mesh(wallGeom, wallMat)
+      southWall.rotateX(-3.14/2)
+      southWall.position.y = -gridLen/2
+      scene.add(southWall)
 }
 
 //loads a mesh with the name url and the kind of object type
@@ -97,13 +123,50 @@ function createWorldObjects(worldObjPos) {
       let newPlant = glbObjs.get(key).clone()
       newPlant.position.x = value[i][0]
       newPlant.position.y = value[i][1]
-      objCoords[[value[i][0], value[i][1]]] = newPlant;
-      objCoords[[value[i][0], value[i][1]]].name = key;
-      console.log("objCoords.name: " + objCoords[[value[i][0], value[i][1]]].name)
-      scene.add(objCoords[[value[i][0], value[i][1]]])
+      worldObjs[[value[i][0], value[i][1]]] = newPlant;
+      worldObjs[[value[i][0], value[i][1]]].name = key;
+      console.log("worldObjs.name: " + worldObjs[[value[i][0], value[i][1]]].name)
+      scene.add(worldObjs[[value[i][0], value[i][1]]])
     }
   }
+}
 
+//returns true if player is at an edge, false if not
+// function atWall() {
+//   let currX = Math.round(player.position.x)
+//   let currY = Math.round(player.position.y)
+//   if(currX == 0 || currY == 0 || currX == gridLen || currY == gridLen) {
+//     return true
+//   } else {
+//     return false
+//   }
+// }
+
+function createNewLevel(newLayout) {
+  // if (!atWall()) {
+  //   console.log("buildNewLevel() called, but player is not at a wall")
+  //   return
+  // }
+
+/**
+ * for plant in worldObjects
+ *    if (newLayout has plant coords for plant name)
+ *        move the worldObject plant to the new coordinates
+ *        remove these coords from the worldObject plant type
+ *    else
+ *        remove this object from world Objects
+ * for plantType in newLayout
+ *    for coords in plantType
+ *        create this new plant and add it to worldObjects
+ */
+
+  for (let coords in worldObjs) {
+    if (newLayout.get(worldObjs[obj].name).length != 0) {
+        worldObjs[obj].position.x = coords[0];
+        worldObjs[obj].position.y = coords[1]
+        //rename key
+      }
+    }
 }
 
 //Handles movement
@@ -115,36 +178,52 @@ function update() {
   //need to standardize these so they always add up to the same number or the speed
   //will be jerky
 
+  var lookingEast = cameraDirection.x < 0
+  var lookingWest = cameraDirection.x > 0
+  var lookingNorth = cameraDirection.y < 0
+  var lookingSouth = cameraDirection.y > 0
+
   //player +  movement
   if (keyboard.pressed("W")) { //forward
-    player.position.x += speed * cameraDirection.x;
-    player.position.y += speed * cameraDirection.y;
+      if ((lookingEast || player.position.x < gridLen/2) && (lookingWest || player.position.x > -gridLen/2))
+        player.position.x += speed * cameraDirection.x;
+      if ((lookingNorth || player.position.y < gridLen/2) && (lookingSouth || player.position.y > -gridLen/2))
+        player.position.y += speed * cameraDirection.y;
   } else if (keyboard.pressed("S")) { //backward
-    player.position.x -= speed * cameraDirection.x;
-    player.position.y -= speed * cameraDirection.y;
+      if ((lookingWest || player.position.x < gridLen/2) && (lookingEast || player.position.x > -gridLen/2))
+        player.position.x -= speed * cameraDirection.x;
+      if ((lookingSouth || player.position.y < gridLen/2) && (lookingNorth || player.position.y > -gridLen/2))
+        player.position.y -= speed * cameraDirection.y;
   } if (keyboard.pressed("A")) { //left
-    player.position.x -= speed * cameraDirection.y;
-    player.position.y += speed * cameraDirection.x;
+      if ((lookingSouth || player.position.x < gridLen/2) && (lookingNorth || player.position.x > -gridLen/2))
+        player.position.x -= speed * cameraDirection.y;
+      if ((lookingEast || player.position.y < gridLen/2) && (lookingWest || player.position.y > -gridLen/2))
+        player.position.y += speed * cameraDirection.x;
   } else if (keyboard.pressed("D")) { //right
-    player.position.x += speed * cameraDirection.y;
-    player.position.y -= speed * cameraDirection.x;
+      if ((lookingNorth || player.position.x < gridLen/2) && (lookingSouth || player.position.x > -gridLen/2))
+        player.position.x += speed * cameraDirection.y;
+      if ((lookingWest || player.position.y < gridLen/2) && (lookingEast || player.position.y > -gridLen/2))
+        player.position.y -= speed * cameraDirection.x;
   }
 
   //player + camera look around
   if (keyboard.pressed("left")) {
     player.rotation.z += speed/3
+    // console.log("cameraDirection.x: ", cameraDirection.x)
+    // console.log("cameraDirection.y: ", cameraDirection.y)
+
   } else if (keyboard.pressed("right")) {
       player.rotation.z -= speed/3
     //picks up objects
   } else if (keyboard.up ("up")) {
       let playerPosKey = [Math.round(player.position.x), Math.round(player.position.y)]
-      if(playerPosKey in objCoords) {
-        let invKey = objCoords[playerPosKey].name
+      if(playerPosKey in worldObjs) {
+        let invKey = worldObjs[playerPosKey].name
         console.log("invKey: " + invKey);
         inventory[invKey] += 1
-        console.log("num in inv:", inventory[objCoords[playerPosKey].name])
-        scene.remove(objCoords[playerPosKey]);
-        delete objCoords[playerPosKey];
+        console.log("num in inv:", inventory[worldObjs[playerPosKey].name])
+        scene.remove(worldObjs[playerPosKey]);
+        delete worldObjs[playerPosKey];
       }
   } else if (keyboard.pressed("down")) {
     //camera.rotation.x -= speed/3.14
@@ -174,11 +253,13 @@ function init() {
   createWorld();
   promisePlantA = loadMesh("plantA");
   promisePlantB = loadMesh("plantB");
+  promisePlantD = loadMesh("plantD")
   promisePlayer = loadMesh("player");
-  Promise.all([promisePlantA,promisePlantB]).then(function() {
+  Promise.all([promisePlantA,promisePlantB,promisePlantD]).then(function() {
     worldObjPos = new Map()
     worldObjPos.set("plantA", [[1, 2], [3, 4],[2,3],[2,4],[5,2],[0,2],[-3,4],[3,-2]]);
     worldObjPos.set("plantB", [[2, 1],[3,5],[2,5],[5,3],[4,3],[4,2]]);
+    worldObjPos.set("plantD", [[4,-2],[1,4],[2, -3],[1,3]])
     createWorldObjects(worldObjPos);
   })
   promisePlayer.then(function() {
@@ -194,7 +275,11 @@ function init() {
   const cube = new THREE.Mesh( geometry, material );
   //scene.add( cube );
 
-  console.log("yes it sure updated")
+  let newLevelCoords = new Map();
+  newLevelCoords.set("PlantA", [[2,3],[2,4]]);
+  createNewLevel(newLevelCoords)
+
+  console.log("yes it updated")
   Promise.all([promisePlantA,promisePlantB,promisePlayer]).then(function() {
     render();
   })
