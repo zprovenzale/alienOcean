@@ -119,6 +119,7 @@ function loadMesh(name) {
 //for each of these objects and coordinates, clones the correct type of object,
 //positions that object, and add the object and its name to the dict of objects in the world
 function createLevel(layout, levelName, z) {
+  //draw floor & walls
   for (let [key, value] of layout) {
     for (let i = 0; i < value.length; i += 1) {
       //createObj(key, value[i][0], value[i][1])
@@ -136,6 +137,7 @@ function createLevel(layout, levelName, z) {
 }
 
 function destroyLevel(levelName) {
+  //remove floor & walls?
   for (let key of worldObjs.get(levelName)) {
     scene.remove(level[key])
   }
@@ -158,26 +160,31 @@ function update() {
   var lookingNorth = cameraDirection.y < 0
   var lookingSouth = cameraDirection.y > 0
 
+  var eastBoundary = gridLen/2;
+  var westBoundary = -gridLen/2;
+  var northBoundary = gridLen/2;
+  var southBoundary = -gridLen/2;
+
   //player +  movement
   if (keyboard.pressed("W")) { //forward
-      if ((lookingEast || player.position.x < gridLen/2) && (lookingWest || player.position.x > -gridLen/2))
+      if ((lookingEast || player.position.x < eastBoundary) && (lookingWest || player.position.x > westBoundary))
         player.position.x += speed * cameraDirection.x;
-      if ((lookingNorth || player.position.y < gridLen/2) && (lookingSouth || player.position.y > -gridLen/2))
+      if ((lookingNorth || player.position.y < northBoundary) && (lookingSouth || player.position.y > southBoundary))
         player.position.y += speed * cameraDirection.y;
   } else if (keyboard.pressed("S")) { //backward
-      if ((lookingWest || player.position.x < gridLen/2) && (lookingEast || player.position.x > -gridLen/2))
+      if ((lookingWest || player.position.x < eastBoundary) && (lookingEast || player.position.x > westBoundary))
         player.position.x -= speed * cameraDirection.x;
-      if ((lookingSouth || player.position.y < gridLen/2) && (lookingNorth || player.position.y > -gridLen/2))
+      if ((lookingSouth || player.position.y < northBoundary) && (lookingNorth || player.position.y > southBoundary))
         player.position.y -= speed * cameraDirection.y;
   } if (keyboard.pressed("A")) { //left
-      if ((lookingSouth || player.position.x < gridLen/2) && (lookingNorth || player.position.x > -gridLen/2))
+      if ((lookingSouth || player.position.x < eastBoundary) && (lookingNorth || player.position.x > westBoundary))
         player.position.x -= speed * cameraDirection.y;
-      if ((lookingEast || player.position.y < gridLen/2) && (lookingWest || player.position.y > -gridLen/2))
+      if ((lookingEast || player.position.y < northBoundary) && (lookingWest || player.position.y > southBoundary))
         player.position.y += speed * cameraDirection.x;
   } else if (keyboard.pressed("D")) { //right
-      if ((lookingNorth || player.position.x < gridLen/2) && (lookingSouth || player.position.x > -gridLen/2))
+      if ((lookingNorth || player.position.x < eastBoundary) && (lookingSouth || player.position.x > westBoundary))
         player.position.x += speed * cameraDirection.y;
-      if ((lookingWest || player.position.y < gridLen/2) && (lookingEast || player.position.y > -gridLen/2))
+      if ((lookingWest || player.position.y < northBoundary) && (lookingEast || player.position.y > southBoundary))
         player.position.y -= speed * cameraDirection.x;
   }
 
