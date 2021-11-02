@@ -116,13 +116,14 @@ function loadMesh(name) {
 //for each key iterates through the array of values, which are [x, y] coords
 //for each of these objects and coordinates, clones the correct type of object,
 //positions that object, and add the object and its name to the dict of objects in the world
-function createWorldObjects(worldObjPos) {
-  for (let [key, value] of worldObjPos) {
+function createLevel(layout, z) {
+  for (let [key, value] of layout) {
     for (let i = 0; i < value.length; i += 1) {
       //createObj(key, value[i][0], value[i][1])
       let newPlant = glbObjs.get(key).clone()
       newPlant.position.x = value[i][0]
       newPlant.position.y = value[i][1]
+      newPlant.position.z = z; 
       worldObjs[[value[i][0], value[i][1]]] = newPlant;
       worldObjs[[value[i][0], value[i][1]]].name = key;
       console.log("worldObjs.name: " + worldObjs[[value[i][0], value[i][1]]].name)
@@ -142,32 +143,20 @@ function createWorldObjects(worldObjPos) {
 //   }
 // }
 
-function createNewLevel(newLayout) {
-  // if (!atWall()) {
-  //   console.log("buildNewLevel() called, but player is not at a wall")
-  //   return
-  // }
+// function createNewLevel(newLayout) {
+//   // if (!atWall()) {
+//   //   console.log("buildNewLevel() called, but player is not at a wall")
+//   //   return
+//   // }
 
-/**
- * for plant in worldObjects
- *    if (newLayout has plant coords for plant name)
- *        move the worldObject plant to the new coordinates
- *        remove these coords from the worldObject plant type
- *    else
- *        remove this object from world Objects
- * for plantType in newLayout
- *    for coords in plantType
- *        create this new plant and add it to worldObjects
- */
-
-  for (let coords in worldObjs) {
-    if (newLayout.get(worldObjs[obj].name).length != 0) {
-        worldObjs[obj].position.x = coords[0];
-        worldObjs[obj].position.y = coords[1]
-        //rename key
-      }
-    }
-}
+//   for (let coords in worldObjs) {
+//     if (newLayout.get(worldObjs[obj].name).length != 0) {
+//         worldObjs[obj].position.x = coords[0];
+//         worldObjs[obj].position.y = coords[1]
+//         //rename key
+//       }
+//     }
+// }
 
 //Handles movement
 function update() {
@@ -256,11 +245,11 @@ function init() {
   promisePlantD = loadMesh("plantD")
   promisePlayer = loadMesh("player");
   Promise.all([promisePlantA,promisePlantB,promisePlantD]).then(function() {
-    worldObjPos = new Map()
-    worldObjPos.set("plantA", [[1, 2], [3, 4],[2,3],[2,4],[5,2],[0,2],[-3,4],[3,-2]]);
-    worldObjPos.set("plantB", [[2, 1],[3,5],[2,5],[5,3],[4,3],[4,2]]);
-    worldObjPos.set("plantD", [[4,-2],[1,4],[2, -3],[1,3]])
-    createWorldObjects(worldObjPos);
+    level1Layout = new Map()
+    level1Layout.set("plantA", [[1, 2], [3, 4],[2,3],[2,4],[5,2],[0,2],[-3,4],[3,-2], [-1,3], [-2,0], [-4,4], [-2,-3], [-4,-2]]);
+    level1Layout.set("plantB", [[2, 1],[3,5],[2,5],[5,3],[4,3],[4,2]]);
+    level1Layout.set("plantD", [[4,-2],[1,4],[2, -3],[1,3]])
+    createWorldObjects(level1Layout);
   })
   promisePlayer.then(function() {
     if (debug)
