@@ -8,8 +8,10 @@ var speed = .1 //how fast player moves
 var scene, camera, renderer; // Three.js rendering basics.
 var textureLoader = new THREE.TextureLoader(); //create texture loader
 var gltfLoader = new THREE.GLTFLoader();
-var worldObjs = new Object();
+var worldObjs = new Map();
 var glbObjs = new Map();
+var currLevel = "level1"
+var Objs
 var player;
 
 var inventory = new Map()
@@ -116,7 +118,7 @@ function loadMesh(name) {
 //for each key iterates through the array of values, which are [x, y] coords
 //for each of these objects and coordinates, clones the correct type of object,
 //positions that object, and add the object and its name to the dict of objects in the world
-function createLevel(layout, z) {
+function createLevel(layout, levelName, z) {
   for (let [key, value] of layout) {
     for (let i = 0; i < value.length; i += 1) {
       //createObj(key, value[i][0], value[i][1])
@@ -124,46 +126,23 @@ function createLevel(layout, z) {
       newPlant.position.x = value[i][0]
       newPlant.position.y = value[i][1]
       newPlant.position.z = z; 
-      worldObjs[[value[i][0], value[i][1]]] = newPlant;
-      worldObjs[[value[i][0], value[i][1]]].name = key;
-      console.log("worldObjs.name: " + worldObjs[[value[i][0], value[i][1]]].name)
-      scene.add(worldObjs[[value[i][0], value[i][1]]])
+      worldObjs.set(levelName, new Object())
+      worldObjs.get(levelName)[[value[i][0], value[i][1]]] = newPlant;
+      worldObjs.get(levelName)[[value[i][0], value[i][1]]].name = key;
+      console.log("worldObjs.name: " + worldObjs.get(levelName)[[value[i][0], value[i][1]]].name)
+      scene.add(worldObjs.get(levelName)[[value[i][0], value[i][1]]])
     }
   }
 }
 
-function destroyLevel(level) {
-  for (let key of level) {
+function destroyLevel(levelName) {
+  for (let key of worldObjs.get(levelName)) {
     scene.remove(level[key])
-    level.key.delete();
+  }
+  worldObjs.delete(levelName) //will concurrency be a problem? This better not delete til thing above is done
 
 }
 
-//returns true if player is at an edge, false if not
-// function atWall() {
-//   let currX = Math.round(player.position.x)
-//   let currY = Math.round(player.position.y)
-//   if(currX == 0 || currY == 0 || currX == gridLen || currY == gridLen) {
-//     return true
-//   } else {
-//     return false
-//   }
-// }
-
-// function createNewLevel(newLayout) {
-//   // if (!atWall()) {
-//   //   console.log("buildNewLevel() called, but player is not at a wall")
-//   //   return
-//   // }
-
-//   for (let coords in worldObjs) {
-//     if (newLayout.get(worldObjs[obj].name).length != 0) {
-//         worldObjs[obj].position.x = coords[0];
-//         worldObjs[obj].position.y = coords[1]
-//         //rename key
-//       }
-//     }
-// }
 
 //Handles movement
 function update() {
@@ -214,12 +193,12 @@ function update() {
   } else if (keyboard.up ("up")) {
       let playerPosKey = [Math.round(player.position.x), Math.round(player.position.y)]
       if(playerPosKey in worldObjs) {
-        let invKey = worldObjs[playerPosKey].name
+        let invKey = worldObjs.get(currLevel)[playerPosKey].name
         console.log("invKey: " + invKey);
         inventory[invKey] += 1
-        console.log("num in inv:", inventory[worldObjs[playerPosKey].name])
-        scene.remove(worldObjs[playerPosKey]);
-        delete worldObjs[playerPosKey];
+        console.log("num in inv:", inventory[worldObjs.get(currLevel)[playerPosKey].name])
+        scene.remove(worldObjs.get(currLevel)[playerPosKey]);
+        delete worldObjs.get(currLevel)[playerPosKey];
       }
   } else if (keyboard.pressed("down")) {
     //camera.rotation.x -= speed/3.14
@@ -256,7 +235,7 @@ function init() {
     level1Layout.set("plantA", [[1, 2], [3, 4],[2,3],[2,4],[5,2],[0,2],[-3,4],[3,-2], [-1,3], [-2,0], [-4,4], [-2,-3], [-4,-2]]);
     level1Layout.set("plantB", [[2, 1],[3,5],[2,5],[5,3],[4,3],[4,2]]);
     level1Layout.set("plantD", [[4,-2],[1,4],[2, -3],[1,3]])
-    createWorldObjects(level1Layout);
+    createLevel(level1Layout, currLevel, 0);
   })
   promisePlayer.then(function() {
     if (debug)
@@ -271,9 +250,9 @@ function init() {
   const cube = new THREE.Mesh( geometry, material );
   //scene.add( cube );
 
-  let newLevelCoords = new Map();
-  newLevelCoords.set("PlantA", [[2,3],[2,4]]);
-  createNewLevel(newLevelCoords)
+  // let newLevelCoords = new Map();
+  // newLevelCoords.set("PlantA", [[2,3],[2,4]]);
+  // createNewLevel(newLevelCoords)
 
   console.log("yes it updated")
   Promise.all([promisePlantA,promisePlantB,promisePlayer]).then(function() {
