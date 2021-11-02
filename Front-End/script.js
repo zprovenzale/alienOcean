@@ -132,6 +132,13 @@ function createLevel(layout, z) {
   }
 }
 
+function destroyLevel(level) {
+  for (let key of level) {
+    scene.remove(level[key])
+    level.key.delete();
+
+}
+
 //returns true if player is at an edge, false if not
 // function atWall() {
 //   let currX = Math.round(player.position.x)
